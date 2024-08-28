@@ -2496,13 +2496,13 @@ def upload_single_final_image(current_user, project_id, image_index):
 
         final_image_links = json.loads(project.final_image_links) if project.final_image_links else []
         
-        # Update or add the file path at the correct index
+        # Update or add just the filename at the correct index
         if image_index < len(final_image_links):
-            final_image_links[image_index] = file_path
+            final_image_links[image_index] = filename
         else:
             # Pad the list with None values if necessary
             final_image_links.extend([None] * (image_index - len(final_image_links) + 1))
-            final_image_links[image_index] = file_path
+            final_image_links[image_index] = filename
 
         project.final_image_links = json.dumps(final_image_links)
         if all(final_image_links) and len(final_image_links) == len(json.loads(project.image_links)):
