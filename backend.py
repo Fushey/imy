@@ -995,7 +995,7 @@ def save_3d_floorplan_draft(current_user):
         app.logger.info(f"Created new draft project with ID: {new_project.id}")
 
         # Define the base upload folder
-        base_upload_folder = '/var/www/auftrag.immoyes.com/uploads'
+        base_upload_folder = '/var/www/auftrag.immoyes.com/upload'
 
         # Create a folder for the user based on their email and project ID
         user_folder = os.path.join(base_upload_folder, current_user.email)
