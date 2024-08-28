@@ -992,20 +992,25 @@ def save_3d_floorplan_draft(current_user):
 
         db.session.add(new_project)
         db.session.flush()  # This will assign an ID to new_project
+        app.logger.info(f"Created new draft project with ID: {new_project.id}")
 
-        # Create a folder for the user based on their email
-        user_folder = os.path.join(app.config['UPLOAD_FOLDER'], current_user.email)
-        os.makedirs(user_folder, exist_ok=True)
+        # Define the base upload folder
+        base_upload_folder = '/var/www/auftrag.immoyes.com/uploads'
+
+        # Create a folder for the user based on their email and project ID
+        user_folder = os.path.join(base_upload_folder, current_user.email)
+        project_folder = os.path.join(user_folder, str(new_project.id))
+        os.makedirs(project_folder, exist_ok=True)
+        app.logger.info(f"Created project folder: {project_folder}")
 
         image_links = []
         for i, file in enumerate(files):
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file_path = os.path.join(user_folder, filename)
+                file_path = os.path.join(project_folder, filename)
                 file.save(file_path)
+                app.logger.info(f"Saved file: {file_path}")
                 image_links.append(filename)  # Only append the filename, not the full path
-
-
 
                 floor = request.form.get(f'floors[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
@@ -1017,13 +1022,17 @@ def save_3d_floorplan_draft(current_user):
                     notes=notes
                 )
                 db.session.add(new_image)
+                app.logger.info(f"Added new image to database: {filename}")
             else:
                 app.logger.error(f"Invalid file: {file.filename}")
                 return jsonify({'error': f'Invalid file: {file.filename}'}), 400
 
         new_project.image_links = json.dumps(image_links)
+        app.logger.info(f"Added image links to project: {image_links}")
 
         db.session.commit()
+        app.logger.info("Committed changes to database")
+
         app.logger.info("3D floorplan job saved as draft successfully")
         return jsonify({
             'message': '3D floorplan job saved as draft successfully',
@@ -1031,6 +1040,7 @@ def save_3d_floorplan_draft(current_user):
         }), 201
     except Exception as e:
         app.logger.error(f"Error in save_3d_floorplan_draft: {str(e)}")
+        app.logger.exception("Full traceback:")
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
