@@ -796,14 +796,16 @@ def submit_3d_floorplan(current_user):
 
         db.session.add(new_project)
         db.session.flush()  # This will assign an ID to new_project
+        app.logger.info(f"Created new project with ID: {new_project.id}")
 
-        # Create a folder for the user based on their email and project ID
+        # Define the base upload folder
         base_upload_folder = '/var/www/auftrag.immoyes.com/uploads'
 
         # Create a folder for the user based on their email and project ID
         user_folder = os.path.join(base_upload_folder, current_user.email)
         project_folder = os.path.join(user_folder, str(new_project.id))
         os.makedirs(project_folder, exist_ok=True)
+        app.logger.info(f"Created project folder: {project_folder}")
 
         image_links = []
         floor_details = []
@@ -812,9 +814,8 @@ def submit_3d_floorplan(current_user):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(project_folder, filename)
                 file.save(file_path)
+                app.logger.info(f"Saved file: {file_path}")
                 image_links.append(filename)  # Only append the filename, not the full path
-
-
 
                 floor = request.form.get(f'floors[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
@@ -831,15 +832,20 @@ def submit_3d_floorplan(current_user):
                     notes=notes
                 )
                 db.session.add(new_image)
+                app.logger.info(f"Added new image to database: {filename}")
             else:
                 app.logger.error(f"Invalid file: {file.filename}")
                 return jsonify({'error': f'Invalid file: {file.filename}'}), 400
 
         new_project.image_links = json.dumps(image_links)
+        app.logger.info(f"Added image links to project: {image_links}")
         
         current_user.credits -= total_price
+        app.logger.info(f"Updated user credits. New balance: {current_user.credits}")
 
         db.session.commit()
+        app.logger.info("Committed changes to database")
+
         user_identifier = current_user.email
 
         # Send email to admin
@@ -866,6 +872,7 @@ def submit_3d_floorplan(current_user):
                       recipients=['jansen.tobias@gmail.com'])
         admin_msg.body = admin_body
         mail.send(admin_msg)
+        app.logger.info("Sent admin email")
 
         # Send email to customer
         customer_subject = "Neues 3D Floorplan Projekt erstellt"
@@ -922,6 +929,7 @@ def submit_3d_floorplan(current_user):
             customer_msg.attach("logo.png", "image/png", logo.read(), "inline", headers={'Content-ID': '<logo>'})
 
         mail.send(customer_msg)
+        app.logger.info("Sent customer email")
 
         app.logger.info("3D floorplan job submitted successfully and emails sent")
         return jsonify({
