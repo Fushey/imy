@@ -2538,12 +2538,12 @@ def download_final_images(current_user, project_id):
 
         memory_file = io.BytesIO()
         with zipfile.ZipFile(memory_file, 'w') as zf:
-            for i, image_path in enumerate(final_images):
-                # Use the full path as stored in the database
-                full_path = os.path.join(app.root_path, image_path)
+            for i, image_filename in enumerate(final_images):
+                # Construct the full path using the new format
+                full_path = f'/var/www/auftrag.immoyes.com/finalized_uploads/{image_filename}'
                 if os.path.exists(full_path):
                     # Use just the filename for the archive
-                    archive_name = f'final_image_{i+1}{os.path.splitext(os.path.basename(image_path))[1]}'
+                    archive_name = f'final_image_{i+1}{os.path.splitext(image_filename)[1]}'
                     zf.write(full_path, archive_name)
                 else:
                     app.logger.warning(f"File not found: {full_path}")
