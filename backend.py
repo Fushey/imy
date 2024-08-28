@@ -105,7 +105,7 @@ CORS(app, resources={r"/*": {"origins": "http://auftrag.immoyes.com"}})
 CORS(app, supports_credentials=True, origins=["http://auftrag.immoyes.com", "http://127.0.0.1"])
 
 # Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://d0414046:WS2A99X53jMsvsD7jWeV@w0108f4a.kasserver.com/immoyes'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://d0414046:WS2A99X53jMsvsD7jWeV@w0108f4a.kasserver.com/d0414046'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'  # Change this!
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
