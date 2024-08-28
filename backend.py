@@ -1063,6 +1063,110 @@ import os
 from datetime import datetime
 import json
 
+
+@app.route('/api/virtual-renovation/draft', methods=['POST'])
+@token_required
+def save_virtual_renovation_draft(current_user):
+    try:
+        app.logger.info(f"Received virtual renovation draft request. Form data: {request.form}")
+        app.logger.info(f"Files received: {request.files}")
+
+        if 'files' not in request.files:
+            app.logger.error("No file part in the request")
+            return jsonify({'error': 'No file part'}), 400
+        
+        files = request.files.getlist('files')
+        app.logger.info(f"Number of files received: {len(files)}")
+
+        job_title = request.form.get('jobTitle')
+        furniture_style = request.form.get('furnitureStyle')
+        total_price = request.form.get('totalPrice')
+
+        app.logger.info(f"Job Title: {job_title}")
+        app.logger.info(f"Furniture Style: {furniture_style}")
+        app.logger.info(f"Total Price: {total_price}")
+        
+        if not job_title:
+            app.logger.error("Missing job title")
+            return jsonify({'error': 'Missing job title'}), 400
+        if not furniture_style:
+            app.logger.error("Missing furniture style")
+            return jsonify({'error': 'Missing furniture style'}), 400
+        if not total_price:
+            app.logger.error("Missing total price")
+            return jsonify({'error': 'Missing total price'}), 400
+
+        try:
+            total_price = float(total_price)
+        except ValueError:
+            app.logger.error(f"Invalid total price: {total_price}")
+            return jsonify({'error': 'Invalid total price'}), 400
+
+        new_project = Project(
+            name=job_title,
+            description=f"Virtual Renovation - {furniture_style}",
+            user_id=current_user.id,
+            status='draft',
+            cost=total_price,
+            project_type='virtual_renovation',
+            furniture_style=furniture_style,
+            created_at=datetime.utcnow()
+        )
+
+        db.session.add(new_project)
+        db.session.flush()  # This will assign an ID to new_project
+        app.logger.info(f"Created new draft project with ID: {new_project.id}")
+
+        # Define the base upload folder
+        base_upload_folder = '/var/www/auftrag.immoyes.com/uploads'
+
+        # Create a folder for the user based on their email and project ID
+        user_folder = os.path.join(base_upload_folder, current_user.email)
+        project_folder = os.path.join(user_folder, str(new_project.id))
+        os.makedirs(project_folder, exist_ok=True)
+        app.logger.info(f"Created project folder: {project_folder}")
+
+        image_links = []
+        for i, file in enumerate(files):
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(project_folder, filename)
+                file.save(file_path)
+                app.logger.info(f"Saved file: {file_path}")
+                image_links.append(filename)  # Only append the filename, not the full path
+
+                room_type = request.form.get(f'roomTypes[{i}]', '')
+                notes = request.form.get(f'notes[{i}]', '')
+
+                new_image = Image(
+                    project_id=new_project.id,
+                    file_path=filename,  # Only store the filename, not the full path
+                    room_type=room_type,
+                    notes=notes
+                )
+                db.session.add(new_image)
+                app.logger.info(f"Added new image to database: {filename}")
+            else:
+                app.logger.error(f"Invalid file: {file.filename}")
+                return jsonify({'error': f'Invalid file: {file.filename}'}), 400
+
+        new_project.image_links = json.dumps(image_links)
+        app.logger.info(f"Added image links to project: {image_links}")
+
+        db.session.commit()
+        app.logger.info("Committed changes to database")
+
+        app.logger.info("Virtual renovation job saved as draft successfully")
+        return jsonify({
+            'message': 'Virtual renovation job saved as draft successfully',
+            'project_id': new_project.id
+        }), 201
+    except Exception as e:
+        app.logger.error(f"Error in save_virtual_renovation_draft: {str(e)}")
+        app.logger.exception("Full traceback:")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/virtual-renovation', methods=['POST'])
 @token_required
 def submit_virtual_renovation(current_user):
