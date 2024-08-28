@@ -95,14 +95,14 @@ def check_unread_messages():
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://auftrag.immoyes.com"}})
+CORS(app, resources={r"/*": {"origins": "https://auftrag.immoyes.com"}})
 UPLOAD_FOLDER = 'upload'
 FINALIZED_UPLOAD_FOLDER = 'finalized_uploads'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'heic'}
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://auftrag.immoyes.com"}})
-CORS(app, supports_credentials=True, origins=["http://auftrag.immoyes.com", "http://127.0.0.1"])
+CORS(app, resources={r"/*": {"origins": "https://auftrag.immoyes.com"}})
+CORS(app, supports_credentials=True, origins=["https://auftrag.immoyes.com", "http://127.0.0.1"])
 
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://d0414046:WS2A99X53jMsvsD7jWeV@w0108f4a.kasserver.com/d0414046'
