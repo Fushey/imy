@@ -254,7 +254,7 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'portal@immoyes.com'
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_PASSWORD'] = '2qKt6nZDtmdseZ3FG92A'
 
 # Initialize extensions
 mail = Mail(app)
