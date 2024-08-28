@@ -1550,7 +1550,7 @@ def submit_virtual_staging(current_user):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(project_folder, filename)
                 file.save(file_path)
-                image_links.append(file_path)
+                image_links.append(filename)  # Store only the filename
 
                 room_type = request.form.get(f'roomTypes[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
@@ -1562,7 +1562,7 @@ def submit_virtual_staging(current_user):
 
                 new_image = Image(
                     project_id=new_project.id,
-                    file_path=file_path,
+                    file_path=filename,  # Store only the filename
                     room_type=room_type,
                     notes=notes
                 )
