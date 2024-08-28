@@ -798,7 +798,10 @@ def submit_3d_floorplan(current_user):
         db.session.flush()  # This will assign an ID to new_project
 
         # Create a folder for the user based on their email and project ID
-        user_folder = os.path.join(current_user.email)
+        base_upload_folder = '/var/www/auftrag.immoyes.com/uploads'
+
+        # Create a folder for the user based on their email and project ID
+        user_folder = os.path.join(base_upload_folder, current_user.email)
         project_folder = os.path.join(user_folder, str(new_project.id))
         os.makedirs(project_folder, exist_ok=True)
 
