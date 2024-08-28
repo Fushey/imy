@@ -96,8 +96,8 @@ def check_unread_messages():
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "https://auftrag.immoyes.com"}})
-UPLOAD_FOLDER = 'upload'
-FINALIZED_UPLOAD_FOLDER = 'finalized_uploads'
+UPLOAD_FOLDER = '/var/www/auftrag.immoyes.com/upload'
+FINALIZED_UPLOAD_FOLDER = '/var/www/auftrag.immoyes.com/finalized_uploads'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'heic'}
 
 app = Flask(__name__)
