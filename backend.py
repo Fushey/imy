@@ -809,7 +809,9 @@ def submit_3d_floorplan(current_user):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(project_folder, filename)
                 file.save(file_path)
-                image_links.append(file_path)
+                image_links.append(filename)  # Only append the filename, not the full path
+
+
 
                 floor = request.form.get(f'floors[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
@@ -821,7 +823,7 @@ def submit_3d_floorplan(current_user):
 
                 new_image = Image(
                     project_id=new_project.id,
-                    file_path=file_path,
+                    file_path=filename,  # Only store the filename, not the full path
                     room_type=floor,  # Using room_type to store floor information
                     notes=notes
                 )
@@ -990,14 +992,16 @@ def save_3d_floorplan_draft(current_user):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(user_folder, filename)
                 file.save(file_path)
-                image_links.append(file_path)
+                image_links.append(filename)  # Only append the filename, not the full path
+
+
 
                 floor = request.form.get(f'floors[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
 
                 new_image = Image(
                     project_id=new_project.id,
-                    file_path=file_path,
+                    file_path=filename,  # Only store the filename, not the full path
                     room_type=floor,  # Using room_type to store floor information
                     notes=notes
                 )
