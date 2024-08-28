@@ -1955,38 +1955,54 @@ def save_virtual_staging_draft(current_user):
             user_id=current_user.id,
             status='draft',
             cost=total_price,
+            project_type='virtual_staging',
             furniture_style=furniture_style,
-            created_at=datetime.datetime.utcnow()
+            created_at=datetime.utcnow()
         )
 
         db.session.add(new_project)
         db.session.flush()  # This will assign an ID to new_project
+        app.logger.info(f"Created new draft project with ID: {new_project.id}")
+
+        # Define the base upload folder
+        base_upload_folder = '/var/www/auftrag.immoyes.com/upload'
+
+        # Create a folder for the user based on their email and project ID
+        user_folder = os.path.join(base_upload_folder, current_user.email)
+        project_folder = os.path.join(user_folder, str(new_project.id))
+        os.makedirs(project_folder, exist_ok=True)
+        app.logger.info(f"Created project folder: {project_folder}")
 
         image_links = []
         for i, file in enumerate(files):
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file_path = os.path.join(project_folder, filename)
                 file.save(file_path)
-                image_links.append(file_path)
+                app.logger.info(f"Saved file: {file_path}")
+                image_links.append(filename)  # Only append the filename, not the full path
 
                 room_type = request.form.get(f'roomTypes[{i}]', '')
                 notes = request.form.get(f'notes[{i}]', '')
 
                 new_image = Image(
                     project_id=new_project.id,
-                    file_path=file_path,
+                    file_path=filename,  # Only store the filename, not the full path
                     room_type=room_type,
                     notes=notes
                 )
                 db.session.add(new_image)
+                app.logger.info(f"Added new image to database: {filename}")
             else:
                 app.logger.error(f"Invalid file: {file.filename}")
                 return jsonify({'error': f'Invalid file: {file.filename}'}), 400
 
         new_project.image_links = json.dumps(image_links)
+        app.logger.info(f"Added image links to project: {image_links}")
 
         db.session.commit()
+        app.logger.info("Committed changes to database")
+
         app.logger.info("Virtual staging job saved as draft successfully")
         return jsonify({
             'message': 'Virtual staging job saved as draft successfully',
@@ -1994,6 +2010,7 @@ def save_virtual_staging_draft(current_user):
         }), 201
     except Exception as e:
         app.logger.error(f"Error in save_virtual_staging_draft: {str(e)}")
+        app.logger.exception("Full traceback:")
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
