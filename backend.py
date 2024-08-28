@@ -2938,4 +2938,4 @@ if __name__ == '__main__':
     init_scheduler()  # Initialize and start the scheduler
     
     logger.info("Starting Flask server on port 1000")
-    app.run(host='0.0.0.0', port=1000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)
