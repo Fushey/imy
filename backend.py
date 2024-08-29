@@ -1446,20 +1446,20 @@ def get_jobs(current_user):
         {
             "title": "Virtuelles Homestaging",
             "price": 69.00,
-            "beforeImage": "https://auftrag.immoyes.com/static/bilder/vhb.webp",
-            "afterImage": "https://auftrag.immoyes.com/static/bilder/vha.webp"
+            "beforeImage": "https://auftrag.immoyes.com/static/bilder/VHB.webp",
+            "afterImage": "https://auftrag.immoyes.com/static/bilder/VHA.webp"
         },
         {
             "title": "Virtuelle Renovierung",
             "price": 99.00,
-            "beforeImage": "https://auftrag.immoyes.com/static/bilder/vrb.jpg",
-            "afterImage": "https://auftrag.immoyes.com/static/bilder/vra.webp"
+            "beforeImage": "https://auftrag.immoyes.com/static/bilder/VRB.jpg",
+            "afterImage": "https://auftrag.immoyes.com/static/bilder/VRA.webp"
         },
         {
             "title": "3D Grundriss",
             "price": 69.00,
-            "beforeImage": "https://auftrag.immoyes.com/static/bilder/gra.jpeg",
-            "afterImage": "https://auftrag.immoyes.com/static/bilder/grb.webp"
+            "beforeImage": "https://auftrag.immoyes.com/static/bilder/GRA.jpeg",
+            "afterImage": "https://auftrag.immoyes.com/static/bilder/GRB.webp"
         }
     ]
     return jsonify(jobs)
