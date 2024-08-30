@@ -140,7 +140,7 @@ function logout() {
     localStorage.removeItem('user_id');
     localStorage.removeItem('email');
     // Redirect to login page or home page
-    window.location.href = 'index.php?page=login';
+    window.location.href = 'index.php?page=dashboard';
 }
 </script>
 </body>
