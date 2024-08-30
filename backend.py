@@ -684,6 +684,11 @@ def register():
     if not email or not password:
         return jsonify({'message': 'Email and password are required'}), 400
 
+    # Check if user already exists before trying to create a new one
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'message': 'Email already exists'}), 409
+
     # Hash the password before storing it
     hashed_password = generate_password_hash(password)
 
@@ -706,9 +711,37 @@ def register():
             'is_admin': new_user.is_admin
         }), 201
 
-    except IntegrityError:
+    except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'Email already exists'}), 409
+        print(f"Error during registration: {str(e)}")  # Log the error
+        return jsonify({'message': 'An error occurred during registration'}), 500
+
+# Frontend (JavaScript)
+fetch('https://api.immoyes.com/register', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+})
+.then(response => {
+    if (!response.ok) {
+        return response.json().then(err => { throw err; });
+    }
+    return response.json();
+})
+.then(data => {
+    console.log('Success:', data);
+    showSuccess("Konto erfolgreich erstellt! Sie können sich jetzt einloggen.");
+})
+.catch((error) => {
+    console.error('Error:', error);
+    if (error.message === 'Email already exists') {
+        showError("Diese E-Mail-Adresse ist bereits registriert.");
+    } else {
+        showError("Ein Fehler ist bei der Registrierung aufgetreten. Bitte versuchen Sie es später erneut.");
+    }
+})
 
 @app.route('/login', methods=['POST'])
 def login():
