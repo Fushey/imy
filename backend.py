@@ -1369,23 +1369,25 @@ def submit_virtual_renovation(current_user):
 @app.route('/profile', methods=['GET'])
 @token_required
 def get_profile(current_user):
-    user_data = {'username': current_user.username, 'email': current_user.email, 'credits': current_user.credits}
+    user_data = {'email': current_user.email, 'credits': current_user.credits}
     return jsonify(user_data)
 
 @app.route('/profile', methods=['PUT'])
 @token_required
 def update_profile(current_user):
     data = request.get_json()
-    current_user.username = data.get('username', current_user.username)
     current_user.email = data.get('email', current_user.email)
     db.session.commit()
     return jsonify({'message': 'Profile updated successfully'})
+
+@app.route('/uptime', methods=['GET'])
+def uptime_check():
+    return jsonify({'status': 'ok', 'message': 'Server is up and running'}), 200
 
 @app.route('/extended-profile', methods=['GET'])
 @token_required
 def get_extended_profile(current_user):
     user_data = {
-        
         'email': current_user.email,
         'credits': current_user.credits,
         'vorname': current_user.vorname,
