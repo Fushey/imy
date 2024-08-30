@@ -719,13 +719,13 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    if not username or not password:
-        return jsonify({'message': 'Username and password are required'}), 400
+    if not email or not password:
+        return jsonify({'message': 'Email and password are required'}), 400
 
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(email=email).first()
 
     if user and check_password_hash(user.password, password):
         token = jwt.encode({
@@ -737,13 +737,12 @@ def login():
             'message': 'Logged in successfully',
             'token': token,
             'user_id': user.id,
-            'username': user.username,
             'email': user.email,
             'credits': user.credits,
             'is_admin': user.is_admin
         }), 200
     else:
-        return jsonify({'message': 'Invalid username or password'}), 401
+        return jsonify({'message': 'Invalid email or password'}), 401
 
 # Add this new route for 3D Floorplans
 @app.route('/api/3d-floorplan', methods=['POST'])

@@ -34,10 +34,10 @@ if (isset($_SESSION['user_id'])) {
 
                 <form id="login-form">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
                             E-Mail
                         </label>
-                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" name="username" required>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" name="email" required>
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
@@ -62,12 +62,12 @@ if (isset($_SESSION['user_id'])) {
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const statusMessage = document.getElementById('status-message');
 
     const data = {
-        username: username,
+        email: email,
         password: password
     };
 
@@ -102,7 +102,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             },
             body: JSON.stringify({
                 user_id: data.user_id,
-                username: data.username
+                email: data.email
             })
         });
     })
