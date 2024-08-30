@@ -255,6 +255,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'portal@immoyes.com'
 app.config['MAIL_PASSWORD'] = '2qKt6nZDtmdseZ3FG92A'
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 80 MB
 
 # Initialize extensions
 mail = Mail(app)
