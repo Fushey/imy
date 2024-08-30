@@ -255,7 +255,6 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'portal@immoyes.com'
 app.config['MAIL_PASSWORD'] = '2qKt6nZDtmdseZ3FG92A'
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 80 MB
 
 # Initialize extensions
 mail = Mail(app)
@@ -985,7 +984,7 @@ def save_3d_floorplan_draft(current_user):
             name=job_title,
             description="3D Floorplan",
             user_id=current_user.id,
-            status='Entwurf - Nicht bezahlt',
+            status='entwurf',
             cost=total_price,
             project_type='3d_floorplan',
             created_at=datetime.utcnow()
@@ -1107,7 +1106,7 @@ def save_virtual_renovation_draft(current_user):
             name=job_title,
             description=f"Virtual Renovation - {furniture_style}",
             user_id=current_user.id,
-            status='Entwurf - Nicht bezahlt',
+            status='entwurf',
             cost=total_price,
             project_type='virtual_renovation',
             furniture_style=furniture_style,
@@ -2058,7 +2057,7 @@ def save_virtual_staging_draft(current_user):
             name=job_title,
             description=f"Virtual Staging - {furniture_style}",
             user_id=current_user.id,
-            status='Entwurf - Nicht bezahlt',
+            status='entwurf',
             cost=total_price,
             project_type='virtual_staging',
             furniture_style=furniture_style,
