@@ -984,7 +984,7 @@ def save_3d_floorplan_draft(current_user):
             name=job_title,
             description="3D Floorplan",
             user_id=current_user.id,
-            status='draft',
+            status='Entwurf - Nicht bezahlt',
             cost=total_price,
             project_type='3d_floorplan',
             created_at=datetime.utcnow()
