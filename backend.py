@@ -716,32 +716,6 @@ def register():
         print(f"Error during registration: {str(e)}")  # Log the error
         return jsonify({'message': 'An error occurred during registration'}), 500
 
-# Frontend (JavaScript)
-fetch('https://api.immoyes.com/register', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-})
-.then(response => {
-    if (!response.ok) {
-        return response.json().then(err => { throw err; });
-    }
-    return response.json();
-})
-.then(data => {
-    console.log('Success:', data);
-    showSuccess("Konto erfolgreich erstellt! Sie können sich jetzt einloggen.");
-})
-.catch((error) => {
-    console.error('Error:', error);
-    if (error.message === 'Email already exists') {
-        showError("Diese E-Mail-Adresse ist bereits registriert.");
-    } else {
-        showError("Ein Fehler ist bei der Registrierung aufgetreten. Bitte versuchen Sie es später erneut.");
-    }
-})
 
 @app.route('/login', methods=['POST'])
 def login():
