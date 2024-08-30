@@ -1385,7 +1385,7 @@ def update_profile(current_user):
 @token_required
 def get_extended_profile(current_user):
     user_data = {
-        'username': current_user.username,
+        
         'email': current_user.email,
         'credits': current_user.credits,
         'vorname': current_user.vorname,
