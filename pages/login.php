@@ -59,6 +59,7 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
 <script>
+// Frontend JavaScript (updated)
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -90,7 +91,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         return response.json();
     })
     .then(data => {
-        console.log('Success:', data);
+        console.log('Login Success:', data);
         // Store the token in localStorage
         localStorage.setItem('token', data.token);
         
@@ -102,11 +103,17 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             },
             body: JSON.stringify({
                 user_id: data.user_id,
-                email: data.email
+                email: data.email,
+                token: data.token  // Include the token in the session data
             })
         });
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to set session');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Show success message
@@ -128,6 +135,23 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         statusMessage.classList.add('bg-red-100', 'text-red-700');
     });
 });
+
+// PHP Session Handling (set_session.php)
+<?php
+session_start();
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (isset($data['user_id']) && isset($data['email']) && isset($data['token'])) {
+    $_SESSION['user_id'] = $data['user_id'];
+    $_SESSION['email'] = $data['email'];
+    $_SESSION['token'] = $data['token'];
+    
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid session data']);
+}
+?>
 </script>
 </body>
 </html>
