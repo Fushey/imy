@@ -677,20 +677,18 @@ def cleanup_invalidated_tokens():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    username = data.get('username')
     email = data.get('email')
     password = data.get('password')
 
     # Basic input validation
-    if not username or not email or not password:
-        return jsonify({'message': 'Username, email, and password are required'}), 400
+    if not email or not password:
+        return jsonify({'message': 'Email and password are required'}), 400
 
     # Hash the password before storing it
     hashed_password = generate_password_hash(password)
 
     # Create a new user instance
     new_user = User(
-        username=username,
         email=email,
         password=hashed_password
     )
@@ -703,7 +701,6 @@ def register():
         return jsonify({
             'message': 'User registered successfully',
             'user_id': new_user.id,
-            'username': new_user.username,
             'email': new_user.email,
             'credits': new_user.credits,
             'is_admin': new_user.is_admin
@@ -711,7 +708,7 @@ def register():
 
     except IntegrityError:
         db.session.rollback()
-        return jsonify({'message': 'Username or email already exists'}), 409
+        return jsonify({'message': 'Email already exists'}), 409
 
 @app.route('/login', methods=['POST'])
 def login():
