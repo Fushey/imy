@@ -1,14 +1,3 @@
-<?php
-
-$pageTitle = 'Login - ImmoYes';
-
-// If user is already logged in, redirect to dashboard
-if (isset($_SESSION['user_id'])) {
-    header('Location: index.php?page=dashboard');
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,7 +48,6 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
 <script>
-// Updated frontend JavaScript
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -76,7 +64,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
     statusMessage.classList.add('bg-blue-100', 'text-blue-700');
 
-    fetch('https://api.immoyes.com/login', {
+    fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -91,57 +79,44 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         return response.json();
     })
     .then(data => {
-        console.log('Login Success:', data);
+        console.log('Success:', data);
         // Store the token in localStorage
         localStorage.setItem('token', data.token);
-        // Store other user data if needed
-        localStorage.setItem('user_id', data.user_id);
-        localStorage.setItem('email', data.email);
         
-        // Show success message
-        statusMessage.textContent = "Anmeldung erfolgreich. Weiterleitung...";
-        statusMessage.classList.remove('bg-blue-100', 'text-blue-700');
-        statusMessage.classList.add('bg-green-100', 'text-green-700');
-        
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-            window.location.href = 'index.php?page=dashboard';
-        }, 1500);
+        // Set session via AJAX
+        return fetch('set_session.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: data.user_id,
+                email: data.email
+            })
+        });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            statusMessage.textContent = "Anmeldung erfolgreich. Weiterleitung...";
+            statusMessage.classList.remove('bg-blue-100', 'text-blue-700');
+            statusMessage.classList.add('bg-green-100', 'text-green-700');
+            // Redirect to dashboard after a short delay
+            setTimeout(() => {
+                window.location.href = 'index.php?page=dashboard';
+            }, 1500);
+        } else {
+            throw new Error('Failed to set session');
+        }
     })
     .catch((error) => {
         console.error('Error:', error);
-        statusMessage.textContent = error.message || "Login fehlgeschlagen. Bitte versuchen Sie es erneut.";
+        statusMessage.textContent = error.message || "Login failed. Please try again.";
         statusMessage.classList.remove('bg-blue-100', 'text-blue-700');
         statusMessage.classList.add('bg-red-100', 'text-red-700');
     });
 });
-
-// Function to get the token (to be used for authenticated requests)
-function getToken() {
-    return localStorage.getItem('token');
-}
-
-// Example of how to use the token in subsequent requests
-function makeAuthenticatedRequest(url, method, body) {
-    return fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify(body)
-    })
-    .then(response => response.json());
-}
-
-// Logout function
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('email');
-    // Redirect to login page or home page
-    window.location.href = 'index.php?page=dashboard';
-}
 </script>
 </body>
 </html>
