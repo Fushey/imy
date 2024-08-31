@@ -3091,7 +3091,7 @@ def request_password_reset():
     token = serializer.dumps(user.email, salt='password-reset-salt')
     
     # Create the reset link
-    reset_url = f"http://auftrag.immoyes.com/reset-password?token={token}"
+    reset_url = f"http://auftrag.immoyes.com/passwortreset.php?token={token}"
     
     # Send email
     subject = "Password Reset Request"
