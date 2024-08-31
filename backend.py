@@ -119,7 +119,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_size': 10,  # Maximum number of persistent connections
     'max_overflow': 5,  # Maximum number of connections that can be created beyond the pool_size
     'pool_timeout': 30,  # Specifies the maximum number of seconds to wait when retrieving a new connection from the pool
-    'pool_recycle': 1800,  # Recycle connections after the given number of seconds (30 minutes here)
+    'pool_recycle': 200,  # Recycle connections after the given number of seconds (30 minutes here)
 }
 
 @event.listens_for(Engine, "checkout")
