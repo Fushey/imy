@@ -38,21 +38,18 @@
                     <h1 class="text-2xl font-bold ml-3">ImmoYes Admin</h1>
                 </div>
                 <a href="http://auftrag.immoyes.com/admin.php" class="sidebar-link active flex items-center py-3 px-4 rounded-lg transition duration-200 hover:bg-white hover:bg-opacity-10 mb-2">
-                        <i class="fas fa-project-diagram sidebar-icon mr-3 text-lg"></i>
-                        <span class="font-medium">Auftraege</span>
-                    </a>
-                    <a href="http://auftrag.immoyes.com/pages/operatorchat.php" class="sidebar-link flex items-center py-3 px-4 rounded-lg transition duration-200 hover:bg-white hover:bg-opacity-10 mb-2">
-                        <i class="fas fa-project-diagram sidebar-icon mr-3 text-lg"></i>
-                        <span class="font-medium">Chat</span>
-                    </a>
-                    
-                    <a href="http://auftrag.immoyes.com/pages/analytics.php" class="sidebar-link flex items-center py-3 px-4 rounded-lg transition duration-200 hover:bg-white hover:bg-opacity-10 mb-2">
-                        <i class="fas fa-chart-line sidebar-icon mr-3 text-lg"></i>
-                        <span class="font-medium">Analytics</span>
-                    </a>
-                    
+                    <i class="fas fa-project-diagram sidebar-icon mr-3 text-lg"></i>
+                    <span class="font-medium">Auftraege</span>
+                </a>
+                <a href="http://auftrag.immoyes.com/pages/operatorchat.php" class="sidebar-link flex items-center py-3 px-4 rounded-lg transition duration-200 hover:bg-white hover:bg-opacity-10 mb-2">
+                    <i class="fas fa-project-diagram sidebar-icon mr-3 text-lg"></i>
+                    <span class="font-medium">Chat</span>
+                </a>
+                <a href="http://auftrag.immoyes.com/pages/analytics.php" class="sidebar-link flex items-center py-3 px-4 rounded-lg transition duration-200 hover:bg-white hover:bg-opacity-10 mb-2">
+                    <i class="fas fa-chart-line sidebar-icon mr-3 text-lg"></i>
+                    <span class="font-medium">Analytics</span>
+                </a>
             </div>
-            
         </aside>
 
         <!-- Main Content -->
@@ -71,7 +68,7 @@
 
             <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <div class="mb-6">
-                    <input type="text" id="searchInput" placeholder="Search by project name, email or username..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="searchInput" placeholder="Search by project name or email..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <div class="mb-8">
@@ -170,7 +167,7 @@
 
     function renderProjects(projects) {
         const activeProjects = projects.filter(project => 
-            project.status.toLowerCase() === 'in bearbeitung'
+            project.status.toLowerCase() === 'in bearbeitung' || project.status.toLowerCase() === 'draft'
         );
         const changeRequestedProjects = projects.filter(project => 
             project.status.toLowerCase() === 'änderung gewünscht'
@@ -198,7 +195,6 @@
                     </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${project.username}</div>
                     <div class="text-sm text-gray-500">${project.email || 'N/A'}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -2748,9 +2748,10 @@ def get_all_projects(current_user):
             'furniture_style': project.furniture_style,
             'created_at': project.created_at.isoformat() if project.created_at else None,
             'images': image_list,
-            'final_image_links': project.final_image_links
+            'final_image_links': project.final_image_links,
+            'email': user.email if user else None  # Add the user's email to the project data
         }
-        print(f"Project {project.id} final_image_links: {project.final_image_links}")  # Add this line
+        print(f"Project {project.id} final_image_links: {project.final_image_links}")
         project_list.append(project_data)
     
     return jsonify(project_list)
