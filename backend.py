@@ -1968,7 +1968,6 @@ def get_in_progress_projects(current_user):
             'cost': project.cost,
             'furniture_style': project.furniture_style,
             'created_at': project.created_at.isoformat() if project.created_at else None,
-            'username': user.username if user else 'Unknown',
             'images': image_list
         })
     
@@ -2013,7 +2012,6 @@ def get_admin_project_details(current_user, project_id):
         'cost': project.cost,
         'furniture_style': project.furniture_style,
         'created_at': project.created_at.isoformat() if project.created_at else None,
-        'username': user.username if user else 'Unknown',
         'email': user.email if user else 'Unknown',
         'images': image_data,
         'final_images': final_image_links,
@@ -2749,7 +2747,6 @@ def get_all_projects(current_user):
             'cost': project.cost,
             'furniture_style': project.furniture_style,
             'created_at': project.created_at.isoformat() if project.created_at else None,
-            'username': user.username if user else 'Unknown',
             'images': image_list,
             'final_image_links': project.final_image_links
         }
