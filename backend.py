@@ -3078,7 +3078,7 @@ def get_dashboard_data():
 
 
 
-    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 @app.route('/request-password-reset', methods=['POST'])
 def request_password_reset():
