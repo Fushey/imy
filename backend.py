@@ -872,7 +872,8 @@ def submit_3d_floorplan(current_user):
             admin_body += f"\n- Floor {i+1}: {floor['floor']}\n  Notes: {floor['notes']}"
 
         admin_msg = Message(admin_subject,
-                      sender=app.config['MAIL_USERNAME'],
+                      sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                       recipients=['jansen.tobias@gmail.com'])
         admin_msg.body = admin_body
         mail.send(admin_msg)
@@ -923,7 +924,8 @@ def submit_3d_floorplan(current_user):
         """
 
         customer_msg = Message(customer_subject,
-                               sender=app.config['MAIL_USERNAME'],
+                               sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                                recipients=[current_user.email],
                                bcc=['jansen.tobias@gmail.com'])
         customer_msg.html = customer_html
@@ -1295,7 +1297,8 @@ def submit_virtual_renovation(current_user):
             admin_body += f"\n- Room {i+1}: {room['room_type']}\n  Notes: {room['notes']}"
 
         admin_msg = Message(admin_subject,
-                      sender=app.config['MAIL_USERNAME'],
+                      sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                       recipients=['jansen.tobias@gmail.com'])
         admin_msg.body = admin_body
         mail.send(admin_msg)
@@ -1345,7 +1348,8 @@ def submit_virtual_renovation(current_user):
         """
 
         customer_msg = Message(customer_subject,
-                               sender=app.config['MAIL_USERNAME'],
+                               sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                                recipients=[current_user.email],
                                bcc=['jansen.tobias@gmail.com'])
         customer_msg.html = customer_html
@@ -1734,7 +1738,8 @@ def submit_virtual_staging(current_user):
             admin_body += f"\n- Room {i+1}: {room['room_type']}\n  Notes: {room['notes']}"
 
         admin_msg = Message(admin_subject,
-                      sender=app.config['MAIL_USERNAME'],
+                      sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                       recipients=['jansen.tobias@gmail.com'])
         admin_msg.body = admin_body
         mail.send(admin_msg)
@@ -1784,7 +1789,8 @@ def submit_virtual_staging(current_user):
         """
 
         customer_msg = Message(customer_subject,
-                               sender=app.config['MAIL_USERNAME'],
+                               sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                                recipients=[current_user.email],
                                bcc=['jansen.tobias@gmail.com'])
         customer_msg.html = customer_html
@@ -3110,7 +3116,8 @@ def passwort_zuruecksetzen_anfrage():
     
     try:
         nachricht = Message(betreff,
-                      sender=app.config['MAIL_USERNAME'],
+                      sender=("Immo Yes", app.config['MAIL_USERNAME']),
+
                       recipients=[benutzer.email])
         nachricht.body = inhalt
         mail.send(nachricht)
