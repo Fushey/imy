@@ -3078,7 +3078,7 @@ def get_dashboard_data():
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-@app.route('/passwort-zuruecksetzen-anfrage', methods=['POST'])
+@app.route('/request-password-reset', methods=['POST'])
 def passwort_zuruecksetzen_anfrage():
     email = request.json.get('email')
     benutzer = User.query.filter_by(email=email).first()
@@ -3119,7 +3119,7 @@ def passwort_zuruecksetzen_anfrage():
         app.logger.error(f"Fehler beim Senden der E-Mail zum Zurücksetzen des Passworts: {str(e)}")
         return jsonify({'nachricht': 'Beim Senden der Zurücksetz-E-Mail ist ein Fehler aufgetreten.'}), 500
 
-@app.route('/passwort-zuruecksetzen', methods=['POST'])
+@app.route('/reset-password', methods=['POST'])
 def passwort_zuruecksetzen():
     token = request.json.get('token')
     neues_passwort = request.json.get('neues_passwort')
