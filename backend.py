@@ -3078,70 +3078,70 @@ def get_dashboard_data():
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-@app.route('/request-password-reset', methods=['POST'])
-def request_password_reset():
+@app.route('/passwort-zuruecksetzen-anfrage', methods=['POST'])
+def passwort_zuruecksetzen_anfrage():
     email = request.json.get('email')
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({'message': 'If a user with this email exists, a password reset link has been sent.'}), 200
+    benutzer = User.query.filter_by(email=email).first()
+    if not benutzer:
+        return jsonify({'nachricht': 'Falls ein Benutzer mit dieser E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet.'}), 200
     
-    # Generate a token
-    token = serializer.dumps(user.email, salt='password-reset-salt')
+    # Generiere einen Token
+    token = serializer.dumps(benutzer.email, salt='passwort-zuruecksetzen-salt')
     
-    # Create the reset link
-    reset_url = f"http://auftrag.immoyes.com/passwortreset.php?token={token}"
+    # Erstelle den Zurücksetz-Link
+    zuruecksetz_url = f"http://auftrag.immoyes.com/passwortreset.php?token={token}"
     
-    # Send email
-    subject = "Password Reset Request"
-    body = f"""
-    Dear {user.email},
+    # Sende E-Mail
+    betreff = "Anfrage zum Zurücksetzen des Passworts"
+    inhalt = f"""
+    Sehr geehrte(r) {benutzer.email},
 
-    You have requested to reset your password. Please click on the link below to reset your password:
+    Sie haben angefordert, Ihr Passwort zurückzusetzen. Bitte klicken Sie auf den untenstehenden Link, um Ihr Passwort zurückzusetzen:
 
-    {reset_url}
+    {zuruecksetz_url}
 
-    This link will expire in 1 hour.
+    Dieser Link läuft in 1 Stunde ab.
 
-    If you did not request this, please ignore this email.
+    Wenn Sie dies nicht angefordert haben, ignorieren Sie bitte diese E-Mail.
 
-    Best regards,
+    Mit freundlichen Grüßen,
     ImmoYes Team
     """
     
     try:
-        msg = Message(subject,
+        nachricht = Message(betreff,
                       sender=app.config['MAIL_USERNAME'],
-                      recipients=[user.email])
-        msg.body = body
-        mail.send(msg)
-        return jsonify({'message': 'If a user with this email exists, a password reset link has been sent.'}), 200
+                      recipients=[benutzer.email])
+        nachricht.body = inhalt
+        mail.send(nachricht)
+        return jsonify({'nachricht': 'Falls ein Benutzer mit dieser E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet.'}), 200
     except Exception as e:
-        app.logger.error(f"Error sending password reset email: {str(e)}")
-        return jsonify({'message': 'An error occurred while sending the reset email.'}), 500
+        app.logger.error(f"Fehler beim Senden der E-Mail zum Zurücksetzen des Passworts: {str(e)}")
+        return jsonify({'nachricht': 'Beim Senden der Zurücksetz-E-Mail ist ein Fehler aufgetreten.'}), 500
 
-@app.route('/reset-password', methods=['POST'])
-def reset_password():
+@app.route('/passwort-zuruecksetzen', methods=['POST'])
+def passwort_zuruecksetzen():
     token = request.json.get('token')
-    new_password = request.json.get('new_password')
+    neues_passwort = request.json.get('neues_passwort')
     
-    if not token or not new_password:
-        return jsonify({'message': 'Token and new password are required.'}), 400
+    if not token or not neues_passwort:
+        return jsonify({'nachricht': 'Token und neues Passwort sind erforderlich.'}), 400
     
     try:
-        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)  # Token expires after 1 hour
+        email = serializer.loads(token, salt='passwort-zuruecksetzen-salt', max_age=3600)  # Token läuft nach 1 Stunde ab
     except SignatureExpired:
-        return jsonify({'message': 'The password reset link has expired.'}), 400
+        return jsonify({'nachricht': 'Der Link zum Zurücksetzen des Passworts ist abgelaufen.'}), 400
     except BadSignature:
-        return jsonify({'message': 'The password reset link is invalid.'}), 400
+        return jsonify({'nachricht': 'Der Link zum Zurücksetzen des Passworts ist ungültig.'}), 400
     
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({'message': 'User not found.'}), 404
+    benutzer = User.query.filter_by(email=email).first()
+    if not benutzer:
+        return jsonify({'nachricht': 'Benutzer nicht gefunden.'}), 404
     
-    user.password = generate_password_hash(new_password)
+    benutzer.password = generate_password_hash(neues_passwort)
     db.session.commit()
     
-    return jsonify({'message': 'Your password has been successfully reset.'}), 200
+    return jsonify({'nachricht': 'Ihr Passwort wurde erfolgreich zurückgesetzt.'}), 200
 
 # In your main block
 if __name__ == '__main__':
