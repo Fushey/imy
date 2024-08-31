@@ -48,14 +48,16 @@ from collections import defaultdict
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-
+from tenacity import retry, stop_after_attempt, wait_fixed
+import tenacity
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 
 
 logging.basicConfig(level=logging.DEBUG)
 scheduler = APScheduler()
 
-
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
 def check_db_connection():
     try:
         db.session.execute('SELECT 1')
@@ -64,6 +66,9 @@ def check_db_connection():
         db.session.rollback()
         db.session.remove()
         raise
+
+
+
 
 
 def with_app_context(f):
@@ -748,34 +753,48 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
+    try:
+        check_db_connection()
 
-    check_db_connection()
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
 
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
+        if not email or not password:
+            return jsonify({'message': 'Email and password are required'}), 400
 
-    if not email or not password:
-        return jsonify({'message': 'Email and password are required'}), 400
+        user = User.query.filter_by(email=email).first()
 
-    user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            token = jwt.encode({
+                'user_id': user.id,
+                'exp': datetime.utcnow() + timedelta(hours=24)
+            }, app.config['SECRET_KEY'], algorithm="HS256")
 
-    if user and check_password_hash(user.password, password):
-        token = jwt.encode({
-            'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(hours=24)
-        }, app.config['SECRET_KEY'], algorithm="HS256")
+            return jsonify({
+                'message': 'Logged in successfully',
+                'token': token,
+                'user_id': user.id,
+                'email': user.email,
+                'credits': user.credits,
+                'is_admin': user.is_admin
+            }), 200
+        else:
+            return jsonify({'message': 'Invalid email or password'}), 401
 
-        return jsonify({
-            'message': 'Logged in successfully',
-            'token': token,
-            'user_id': user.id,
-            'email': user.email,
-            'credits': user.credits,
-            'is_admin': user.is_admin
-        }), 200
-    else:
-        return jsonify({'message': 'Invalid email or password'}), 401
+    except OperationalError as e:
+        logger.error(f"Database operational error in login: {str(e)}")
+        return jsonify({'message': 'A database error occurred. Please try again.'}), 500
+    except SQLAlchemyError as e:
+        logger.error(f"SQLAlchemy error in login: {str(e)}")
+        return jsonify({'message': 'A database error occurred. Please try again.'}), 500
+    except tenacity.RetryError as e:
+        logger.error(f"Failed to establish database connection after retries: {str(e)}")
+        return jsonify({'message': 'Unable to connect to the database. Please try again later.'}), 503
+    except Exception as e:
+        logger.error(f"Unexpected error in login: {str(e)}")
+        return jsonify({'message': 'An unexpected error occurred. Please try again.'}), 500
+    
 
 # Add this new route for 3D Floorplans
 @app.route('/api/3d-floorplan', methods=['POST'])
