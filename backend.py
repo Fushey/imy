@@ -46,6 +46,8 @@ from flask_apscheduler import APScheduler
 from functools import wraps
 from collections import defaultdict
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 
 
@@ -112,6 +114,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'  # Change this!
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['FINALIZED_UPLOAD_FOLDER'] = FINALIZED_UPLOAD_FOLDER
+# Add these lines for connection pooling configuration
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 10,  # Maximum number of persistent connections
+    'max_overflow': 5,  # Maximum number of connections that can be created beyond the pool_size
+    'pool_timeout': 30,  # Specifies the maximum number of seconds to wait when retrieving a new connection from the pool
+    'pool_recycle': 1800,  # Recycle connections after the given number of seconds (30 minutes here)
+}
+
+@event.listens_for(Engine, "checkout")
+def receive_checkout(dbapi_connection, connection_record, connection_proxy):
+    logging.info("Connection checked out")
+
+@event.listens_for(Engine, "checkin")
+def receive_checkin(dbapi_connection, connection_record):
+    logging.info("Connection checked in")
 
 scheduler = APScheduler()
 
