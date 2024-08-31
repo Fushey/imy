@@ -48,7 +48,7 @@ from collections import defaultdict
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 import tenacity
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
@@ -57,16 +57,19 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 logging.basicConfig(level=logging.DEBUG)
 scheduler = APScheduler()
 
-@retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+@retry(stop=stop_after_attempt(3), 
+       wait=wait_fixed(1),
+       retry=retry_if_exception_type(SQLAlchemyError))
 def check_db_connection():
     try:
-        db.session.execute('SELECT 1')
-    except Exception as e:
+        db.session.execute(text('SELECT 1'))
+        db.session.commit()
+    except SQLAlchemyError as e:
         logger.error(f"Database connection error: {str(e)}")
         db.session.rollback()
-        db.session.remove()
         raise
-
+    finally:
+        db.session.close()
 
 
 
@@ -782,15 +785,9 @@ def login():
         else:
             return jsonify({'message': 'Invalid email or password'}), 401
 
-    except OperationalError as e:
-        logger.error(f"Database operational error in login: {str(e)}")
-        return jsonify({'message': 'A database error occurred. Please try again.'}), 500
     except SQLAlchemyError as e:
-        logger.error(f"SQLAlchemy error in login: {str(e)}")
+        logger.error(f"Database error in login: {str(e)}")
         return jsonify({'message': 'A database error occurred. Please try again.'}), 500
-    except tenacity.RetryError as e:
-        logger.error(f"Failed to establish database connection after retries: {str(e)}")
-        return jsonify({'message': 'Unable to connect to the database. Please try again later.'}), 503
     except Exception as e:
         logger.error(f"Unexpected error in login: {str(e)}")
         return jsonify({'message': 'An unexpected error occurred. Please try again.'}), 500
