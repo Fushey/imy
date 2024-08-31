@@ -51,6 +51,7 @@ from sqlalchemy.engine import Engine
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 import tenacity
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
+from sqlalchemy import text
 
 
 
