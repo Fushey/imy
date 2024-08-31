@@ -3072,6 +3072,77 @@ def get_dashboard_data():
             'messagesTrend': messages_trend
         }
     })
+
+
+
+
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+@app.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    email = request.json.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'If a user with this email exists, a password reset link has been sent.'}), 200
+    
+    # Generate a token
+    token = serializer.dumps(user.email, salt='password-reset-salt')
+    
+    # Create the reset link
+    reset_url = f"http://auftrag.immoyes.com/reset-password?token={token}"
+    
+    # Send email
+    subject = "Password Reset Request"
+    body = f"""
+    Dear {user.email},
+
+    You have requested to reset your password. Please click on the link below to reset your password:
+
+    {reset_url}
+
+    This link will expire in 1 hour.
+
+    If you did not request this, please ignore this email.
+
+    Best regards,
+    ImmoYes Team
+    """
+    
+    try:
+        msg = Message(subject,
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[user.email])
+        msg.body = body
+        mail.send(msg)
+        return jsonify({'message': 'If a user with this email exists, a password reset link has been sent.'}), 200
+    except Exception as e:
+        app.logger.error(f"Error sending password reset email: {str(e)}")
+        return jsonify({'message': 'An error occurred while sending the reset email.'}), 500
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    token = request.json.get('token')
+    new_password = request.json.get('new_password')
+    
+    if not token or not new_password:
+        return jsonify({'message': 'Token and new password are required.'}), 400
+    
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)  # Token expires after 1 hour
+    except SignatureExpired:
+        return jsonify({'message': 'The password reset link has expired.'}), 400
+    except BadSignature:
+        return jsonify({'message': 'The password reset link is invalid.'}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'User not found.'}), 404
+    
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    
+    return jsonify({'message': 'Your password has been successfully reset.'}), 200
+
 # In your main block
 if __name__ == '__main__':
     logger.info("Starting the application")
