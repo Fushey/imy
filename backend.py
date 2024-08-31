@@ -56,6 +56,16 @@ logging.basicConfig(level=logging.DEBUG)
 scheduler = APScheduler()
 
 
+def check_db_connection():
+    try:
+        db.session.execute('SELECT 1')
+    except Exception as e:
+        logger.error(f"Database connection error: {str(e)}")
+        db.session.rollback()
+        db.session.remove()
+        raise
+
+
 def with_app_context(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -421,6 +431,7 @@ AUTO_REPLY_THRESHOLD = timedelta(minutes=1)  # Adjust this value as needed
 
 @app.route('/api/chat', methods=['POST'])
 @token_required
+
 def send_message(current_user):
     data = request.json
     message = data.get('message')
@@ -737,6 +748,9 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
+
+    check_db_connection()
+
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')

@@ -19,6 +19,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
         }
     </style>
 </head>
+<script src="//code.tidio.co/2mygnnyysqrn6hv5g3spfryxcx7wqj9h.js" async></script>
 <body class="bg-gray-50 text-gray-800">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm fixed w-full z-10">
