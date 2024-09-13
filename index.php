@@ -93,7 +93,7 @@ switch ($page) {
         }
         break;
     default:
-        include 'pages/home.php';
+        include 'home.php';
         break;
 }
 ?>
